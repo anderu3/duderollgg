@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 function DraggableUnit({ championName }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -11,7 +11,7 @@ function DraggableUnit({ championName }) {
       return require(`./assets/champion_sprites/1cost/${name}.png`);
     } catch (error) {
       console.warn(`Image not found for champion: ${name}`);
-      return require('./assets/champion_sprites/1cost/default.png'); // Fallback to a default image
+      return require('./assets/champion_sprites/1cost/default.png');
     }
   };
 
@@ -38,6 +38,18 @@ function DraggableUnit({ championName }) {
     }
   };
 
+  useEffect(() => {
+    if (dragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragging, handleMouseMove, handleMouseUp]);
+
   const unitStyle = {
     position: 'absolute',
     top: position.y + 'px',
@@ -45,15 +57,11 @@ function DraggableUnit({ championName }) {
     cursor: dragging ? 'grabbing' : 'grab',
   };
 
-  if (!championName) return null; // Do not render if championName is not provided
-
   return (
     <div
       ref={unitRef}
       style={unitStyle}
       onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
     >
       <img src={getChampionSpriteImage(championName)} alt={championName} />
     </div>
