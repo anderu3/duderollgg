@@ -14,15 +14,6 @@ const ShopRolls = () => {
     return require(`./assets/champion_in_shop/1cost/${championName}.png`);
   };
 
-  const getChampionSpriteImage = (name: string) => {
-    try {
-      return require(`./assets/champion_sprites/1cost/${name}.png`);
-    } catch (error) {
-      console.warn(`Image not found for champion: ${name}`);
-      return require('./assets/champion_sprites/1cost/default.png');
-    }
-  };
-
   const handleRoll = () => {
     if (player) {
       const newRolls = rollChampions(player.level);
@@ -51,47 +42,51 @@ const ShopRolls = () => {
   return (
     <div>
       <h1>Shop Rolls</h1>
-      {!player ? (
-        <div>
-          <input
-            type="number"
-            value={initialGold}
-            onChange={(e) => setInitialGold(Number(e.target.value))}
-            placeholder="Enter initial gold"
-          />
-          <button onClick={handleStartGame}>Start Game</button>
-        </div>
-      ) : (
-        <div>
-          <p>Gold: {player.gold}</p>
-          <button onClick={handleRoll}>Roll</button>
-          <div style={{ display: 'flex' }}>
-            {rolls.map((champion, index) => (
-              <div key={index} style={{ flex: '1' }}>
-                {champion ? (
-                  <div>
-                    <img src={getChampionShopImage(champion.name)} alt={champion.name} />
-                    <p>Cost: {champion.cost}</p>
-                    <button onClick={() => handlePurchase(champion, index)}>Purchase</button>
-                  </div>
-                ) : (
-                  <div>
-                    <p>Purchased</p>
-                  </div>
-                )}
-              </div>
-            ))}
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        {!player ? (
+          <div>
+            <input
+              type="number"
+              value={initialGold}
+              onChange={(e) => setInitialGold(parseInt(e.target.value))}
+              placeholder="Enter initial gold"
+            />
+            <button onClick={handleStartGame}>Start Game</button>
           </div>
-          <div style={{ display: 'flex' }}>
-            {purchasedChampions.map((championName, index) => (
-              <DraggableUnit key={index} championName={championName} />
-            ))}
+        ) : (
+          <div style={{ flex: 1 }}>
+            <p>Gold: {player.gold}</p>
+            <button onClick={handleRoll}>Roll</button>
+            <div style={{ display: 'flex', marginTop: '10px' }}>
+              {purchasedChampions.map((championName, index) => (
+                <DraggableUnit key={index} championName={championName} />
+              ))}
+            </div>
           </div>
+        )}
+        <div style={{ display: 'flex' }}> {/* Horizontal layout for shop champions */}
+          {rolls.map((champion, index) => (
+            <div key={index} style={{ flex: '1' }}>
+              {champion ? (
+                <div>
+                  <img
+                    src={getChampionShopImage(champion.name)}
+                    alt={champion.name}
+                    onClick={() => handlePurchase(champion, index)}
+                  />
+                  <p>Cost: {champion.cost}</p>
+                </div>
+              ) : (
+                <div>
+                  <p>Purchased</p>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
-
-}
+};
 
 export default ShopRolls;
